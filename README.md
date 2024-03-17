@@ -9,5 +9,5 @@ The .env file is already added so you can access it .
 ### Login Cred
 Id pass to login is 
 ```sh
-prasantmishra2018@gmai.com
+prasantmishra2018@gmail.com
 123456shlok

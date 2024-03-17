@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "lint": "next lint",
-    "start": "node --loader ts-node/esm ./sheetsMapping/connect.js"
+    "lint": "next lint"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -12,4 +12,4 @@ Id pass to login is
 prasantmishra2018@gmail.com
 123456shlok
 ```
-### Currently the direct login through instagram , linkeIn , google and facebook don't work .Kindly use above Id to login or register by filling the form .
+### Currently the direct login through instagram , linkedIn , google and facebook don't work .Kindly use above Id to login or register by filling the form .

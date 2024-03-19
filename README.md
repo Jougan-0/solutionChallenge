@@ -1,6 +1,5 @@
 ### Notice
-Currently, the site is statically deployed. If you want to check real-time changes, clone the repo and run the following commands:
-
+To Run the site locally.
 ```sh
 npm i
 npm run dev

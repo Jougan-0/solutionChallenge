@@ -349,6 +349,7 @@ Add Student
 
 
 const Page: React.FC =() => {
+  
   const [locations, setLocations] = useState<{ _id: string; locationId: string; locationName: string }[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState<string>('');
   const [students, setStudents] = useState<{ studentId: string; name: string; age: number;level:number;Image:string }[]>([]);
@@ -391,6 +392,7 @@ const Page: React.FC =() => {
           locationName: location.locationName,
         }));
         setLocations(locationsData);
+        router.push("/dashboard")
       } catch (error) {
         console.error('Failed to fetch locations:', error);
       }
@@ -411,6 +413,7 @@ const Page: React.FC =() => {
         Image:student.Image,
       })) || [];      
       setStudents(selectedLocationStudents);
+      router.push("/dashboard")
     } catch (error) {
       console.error('Failed to fetch students:', error);
     }

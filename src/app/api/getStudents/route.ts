@@ -1,8 +1,8 @@
 import Location from "@/models/Location";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connect from "@/utils/db";
 
-export const GET = async () => {
+export const POST = async (req: NextRequest) => {
     await connect();
 
     try {

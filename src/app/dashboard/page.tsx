@@ -385,39 +385,52 @@ const Page: React.FC =() => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await fetch('/api/getLocation');
-        const data = await res.json();
-        const locationsData = data.map((location: any) => ({
-          locationId: location.locationId,
-          locationName: location.locationName,
-        }));
-        setLocations(locationsData);
-        router.push("/dashboard")
+          const res = await fetch('/api/getLocation', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({}) // You can pass any data here if required
+          });
+          const data = await res.json();
+          const locationsData = data.map((location: any) => ({
+              locationId: location.locationId,
+              locationName: location.locationName,
+          }));
+          setLocations(locationsData);
+          router.push("/dashboard");
       } catch (error) {
-        console.error('Failed to fetch locations:', error);
+          console.error('Failed to fetch locations:', error);
       }
-    };
-    fetchLocations();
+  };
+  fetchLocations();
+  
   }, []);
 
   const handleLocationChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedLocationId = e.target.value;
     setSelectedLocationId(selectedLocationId);
     try {
-      const res = await fetch('/api/getStudents');
-      const data: Location[] = await res.json();
-      console.log(data)
-      const selectedLocationStudents = data.find((location) => location.locationId === selectedLocationId)?.students.map((student) => ({
-        ...student,
-        level: student.level, 
-        Image:student.Image,
-      })) || [];      
-      setStudents(selectedLocationStudents);
-      router.push("/dashboard")
+        const res = await fetch('/api/getStudents', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ selectedLocationId }) // Send the selectedLocationId in the request body
+        });
+        const data: Location[] = await res.json();
+        const selectedLocationStudents = data.find((location) => location.locationId === selectedLocationId)?.students.map((student) => ({
+            ...student,
+            level: student.level,
+            Image: student.Image,
+        })) || [];
+        setStudents(selectedLocationStudents);
+        router.push("/dashboard");
     } catch (error) {
-      console.error('Failed to fetch students:', error);
+        console.error('Failed to fetch students:', error);
     }
-  };
+};
+
  
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);

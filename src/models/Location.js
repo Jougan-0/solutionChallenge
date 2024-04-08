@@ -11,7 +11,12 @@ const studentSchema = new Schema({
     name: String,
     age: Number,
     level:Number,
+    location: String,
     Image:String,
+    FatherName:String,
+    phoneNo:Number,
+    class:String,
+    school:String,
     // Add other student details as needed
 });
 

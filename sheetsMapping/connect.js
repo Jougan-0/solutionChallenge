@@ -91,7 +91,7 @@ const getLocationId = async (locationName) => {
     return { status: 500, body: "Error finding location" };
   }
 };
-const addStudent=async(currentlocationId,locationName,StudentName,StudentAge,StudentLevel)=>{
+const addStudent=async(currentlocationId,locationName,StudentName,StudentAge,StudentLevel,FatherName,PhNumber,Class,School)=>{
   await connect();
   
   const studentId = uuidv4();
@@ -104,7 +104,7 @@ const addStudent=async(currentlocationId,locationName,StudentName,StudentAge,Stu
           location = new Location({
               locationId:locationId,
               name: locationName,
-              students: [{ studentId, name: StudentName, age: StudentAge,level:StudentLevel }],
+              students: [{ studentId, name: StudentName, age: StudentAge,level:StudentLevel,FatherName:FatherName,phoneNo:PhNumber,class:Class,school:School }],
           });
 
           const locationInfo = new LocationInfo({
@@ -114,7 +114,7 @@ const addStudent=async(currentlocationId,locationName,StudentName,StudentAge,Stu
           await locationInfo.save();
       } else {
           location.locationId=location.locationId
-          location.students.push({ studentId, name: StudentName, age: StudentAge,level:StudentLevel });
+          location.students.push({ studentId, name: StudentName, age: StudentAge,level:StudentLevel,FatherName:FatherName,phoneNo:PhNumber,class:Class,school:School });
       }
       await location.save();
       
@@ -124,7 +124,7 @@ const addStudent=async(currentlocationId,locationName,StudentName,StudentAge,Stu
       return { status: 500, body: {err}};
     }
 }
-const editStudent=async(locationId, studentId, newName, newAge,level)=>{
+const editStudent=async(locationId, studentId, newName, newAge,level,FatherName,PhNumber,Class,School)=>{
   let location = await Location.findOne({ locationId: locationId });
 
   if (!location) {
@@ -140,8 +140,10 @@ const editStudent=async(locationId, studentId, newName, newAge,level)=>{
   location.students[studentIndex].name = newName;
   location.students[studentIndex].age = newAge;
   location.students[studentIndex].level = level;
-
-
+  location.students[studentIndex].FatherName = FatherName;
+  location.students[studentIndex].phoneNo = PhNumber;
+  location.students[studentIndex].class = Class;
+  location.students[studentIndex].school = School;
 
   try {
       await location.save();
@@ -151,21 +153,21 @@ const editStudent=async(locationId, studentId, newName, newAge,level)=>{
   }
 }
 
-const addStudentbyname = async (locationId, locationName, StudentName, StudentAge, StudentLevel) => {
+const addStudentbyname = async (locationId, locationName, StudentName, StudentAge, StudentLevel,FatherName,PhNumber,Class,School) => {
     await connect();
     try {
         if (locationId===0){
-                addStudent(locationId,locationName,StudentName,StudentAge,StudentLevel)
+                addStudent(locationId,locationName,StudentName,StudentAge,StudentLevel,FatherName,PhNumber,Class,School)
                 return { status: 200, body: "Data added" };
               }
       const locationInfo = await Location.findOne({ locationId });
         const filteredStudents = filterStudentsByName(locationInfo, StudentName);
         if (filteredStudents.length === 0) {
-          addStudent(locationId,locationInfo.name,StudentName,StudentAge,StudentLevel)
+          addStudent(locationId,locationInfo.name,StudentName,StudentAge,StudentLevel,FatherName,PhNumber,Class,School )
           return { status: 200, body: "Data added" };
         } else {
           const student = filteredStudents[0]; 
-          editStudent(locationInfo.locationId,student.studentId,StudentName,StudentAge,StudentLevel)
+          editStudent(locationInfo.locationId,student.studentId,StudentName,StudentAge,StudentLevel,FatherName,PhNumber,Class,School)
           return { status: 201, body: "Data edited" };
         }
       
@@ -191,8 +193,8 @@ async function getSheetValues() {
       return [];
     } else {
       const Details = values.map((row) => {
-        const [name, age, level, locationName] = row;
-        return { name, age, level, locationName };
+        const [name, age, level, locationName,Father,PhNumber,Class,School] = row;
+        return { name, age, level, locationName,Father,PhNumber,Class,School  };
       });
       for (const detail of Details) {
         const response = await getLocationId(detail.locationName);
@@ -204,7 +206,11 @@ async function getSheetValues() {
           detail.locationName,
           detail.name,
           detail.age,
-          detail.level
+          detail.level,
+          detail.Father,
+          detail.PhNumber,
+          detail.Class,
+          detail.School
         );
         if (res.status===200){
           console.log(`${detail.name}'s data successfully added to the database`)

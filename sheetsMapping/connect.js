@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { google } = require('googleapis');
 const { v4: uuidv4 } = require('uuid');
+const { unique } = require('next/dist/build/utils');
 const base64Credentials = process.argv[2];
 const Mongo=process.argv[3];
 const Mongo_url = `mongodb+srv://shlokmishr08:${Mongo}@cluster0.evqge0k.mongodb.net/?retryWrites=true&w=majority`;
@@ -16,6 +17,7 @@ const locationInfoSchema = new Schema({
   },
   locationName: {
       type: String,
+      unique:true,
       required: true,
   },
 });

@@ -106,7 +106,7 @@ const addStudent=async(currentlocationId,locationName,StudentName,StudentAge,Stu
               name: locationName,
               students: [{ studentId, name: StudentName, age: StudentAge,level:StudentLevel,FatherName:FatherName,phoneNo:PhNumber,class:Class,school:School }],
           });
-
+          console.log(location)
           const locationInfo = new LocationInfo({
               locationId: location.locationId,
               locationName: location.name,

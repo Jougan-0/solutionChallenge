@@ -183,7 +183,7 @@ async function getSheetValues() {
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: '1Dv7-CBdsu-wDpzF3EH5GH3spBXdKo7K_TKqIqRylkiQ',
-      range: 'Sheet1!A2:D',
+      range: 'Sheet1!A2:H',
     });
     const values = response.data.values;
     console.log(values);

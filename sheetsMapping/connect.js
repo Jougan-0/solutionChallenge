@@ -33,7 +33,10 @@ const studentSchema = new Schema({
   age: Number,
   level:Number,
   Image:String,
- 
+  FatherName:String,
+  phoneNo:Number,
+  class:String,
+  school:String,
 });
 
 

@@ -669,7 +669,7 @@ const Page: React.FC =() => {
 
 {student.fatherName && (
   <p>
-    <span className="label" style={{ marginTop: '10px' }}>Father's Name:</span>
+    <span className="label" style={{ marginTop: '10px' }}>Father&apos;s Name:</span>
     <span className="value" style={{ marginLeft: 20 }}>{student.fatherName}</span>
   </p>
 )}
@@ -701,6 +701,7 @@ const Page: React.FC =() => {
     <span className="value" style={{ marginLeft: 33 }}>{student.school}</span>
   </p>
 )}
+
 
     </div>
   )).reduce((rows: JSX.Element[][], current: JSX.Element, index: number) => {

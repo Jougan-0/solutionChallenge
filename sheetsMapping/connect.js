@@ -1,11 +1,8 @@
 const mongoose = require('mongoose');
 const { google } = require('googleapis');
 const { v4: uuidv4 } = require('uuid');
-const base64Credentials = process.argv[2];
-const Mongo=process.argv[3];
-const Mongo_url = `mongodb+srv://shlokmishr08:${Mongo}@cluster0.evqge0k.mongodb.net/?retryWrites=true&w=majority`;
-const credentials = JSON.parse(Buffer.from(base64Credentials, 'base64').toString('utf-8'));
-
+const Mongo_url = `mongodb+srv://shlokmishr08:${process.argv[3]}@cluster0.evqge0k.mongodb.net/?retryWrites=true&w=majority`;
+const credentials = JSON.parse(Buffer.from(process.argv[2], 'base64').toString('utf-8'));
 const { Schema } = mongoose;
 
 const locationInfoSchema = new Schema({
@@ -16,6 +13,7 @@ const locationInfoSchema = new Schema({
   },
   locationName: {
       type: String,
+      unique:false,
       required: true,
   },
 });
@@ -41,8 +39,16 @@ const studentSchema = new Schema({
 
 
 function filterStudentsByName(locationData, nameToFilter) {
-  return locationData.students.filter(student => student.name === nameToFilter);
+  const filteredStudents = [];
+  for (let i = 0; i < locationData.students.length; i++) {
+    const student = locationData.students[i];
+    if (student.name === nameToFilter) {
+      filteredStudents.push(student);
+    }
+  }
+  return filteredStudents;
 }
+
 const locationSchema = new Schema({
   locationId: {
       type: String,
@@ -81,7 +87,7 @@ const sheets = google.sheets({ version: 'v4', auth });
 
 const getLocationId = async (locationName) => {
   await connect();
-  locationId=0
+  let locationId=0
   try {
     const location = await LocationInfo.findOne({ locationName });
     if (location) {
@@ -96,32 +102,11 @@ const getLocationId = async (locationName) => {
 };
 const addStudent=async(currentlocationId,locationName,StudentName,StudentAge,StudentLevel,FatherName,PhNumber,Class,School)=>{
   await connect();
-  
   const studentId = uuidv4();
   try {
       let location = await Location.findOne({ name: locationName });
-
-      if (!location||currentlocationId===0) {
-          const locationId = uuidv4();
-          
-          location = new Location({
-              locationId:locationId,
-              name: locationName,
-              students: [{ studentId, name: StudentName, age: StudentAge,level:StudentLevel,FatherName:FatherName,phoneNo:PhNumber,class:Class,school:School }],
-          });
-          console.log(location)
-          const locationInfo = new LocationInfo({
-              locationId: location.locationId,
-              locationName: location.name,
-          });
-          await locationInfo.save();
-      } else {
-          location.locationId=location.locationId
           location.students.push({ studentId, name: StudentName, age: StudentAge,level:StudentLevel,FatherName:FatherName,phoneNo:PhNumber,class:Class,school:School });
-      }
       await location.save();
-      
-      
       return { status: 200, body: "Student added successfully" };
     } catch (err) {
       return { status: 500, body: {err}};
@@ -160,17 +145,16 @@ const addStudentbyname = async (locationId, locationName, StudentName, StudentAg
     await connect();
     try {
         if (locationId===0){
-                addStudent(locationId,locationName,StudentName,StudentAge,StudentLevel,FatherName,PhNumber,Class,School)
                 return { status: 200, body: "Data added" };
               }
-      const locationInfo = await Location.findOne({ locationId });
+      const locationInfo = await Location.findOne({locationId });
         const filteredStudents = filterStudentsByName(locationInfo, StudentName);
-        if (filteredStudents.length === 0) {
-          addStudent(locationId,locationInfo.name,StudentName,StudentAge,StudentLevel,FatherName,PhNumber,Class,School )
+        if (filteredStudents.length===0) {
+          addStudent(locationId,locationName,StudentName,StudentAge,StudentLevel,FatherName,PhNumber,Class,School )
           return { status: 200, body: "Data added" };
         } else {
           const student = filteredStudents[0]; 
-          editStudent(locationInfo.locationId,student.studentId,StudentName,StudentAge,StudentLevel,FatherName,PhNumber,Class,School)
+          editStudent(locationId,student.studentId,StudentName,StudentAge,StudentLevel,FatherName,PhNumber,Class,School)
           return { status: 201, body: "Data edited" };
         }
       
@@ -180,16 +164,55 @@ const addStudentbyname = async (locationId, locationName, StudentName, StudentAg
     }
   
 };
-
-
+async function insertLocation() {
+  try {
+     const locationResponse = await sheets.spreadsheets.values.get({
+       spreadsheetId: '1Dv7-CBdsu-wDpzF3EH5GH3spBXdKo7K_TKqIqRylkiQ',
+       range: 'Sheet2!A2:A',
+     });
+     const locationValues = locationResponse.data.values;
+     await connect();
+ 
+     const locationPromises = locationValues.map(async (row) => {
+       const [location] = row;
+       console.log(location);
+       const resp = await getLocationId(location);
+       const bodyObj = JSON.parse(resp.body);
+       const locationId = bodyObj.locationId;
+       if (locationId == 0) {
+        const newLocationId = String(uuidv4());
+        const locationInfo = new LocationInfo({
+           locationId: newLocationId,
+           locationName: location,
+         });
+         const newlocation = new Location({
+          name: location,
+          locationId: newLocationId,
+          students: []
+        });
+        
+        console.log(newlocation);
+         await locationInfo.save();
+         await newlocation.save();
+       }
+     });
+ 
+     await Promise.all(locationPromises);
+     return
+  } catch (err) {
+     console.error(err);
+     throw err; 
+  }
+ }
+ 
 async function getSheetValues() {
   try {
+    
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: '1Dv7-CBdsu-wDpzF3EH5GH3spBXdKo7K_TKqIqRylkiQ',
       range: 'Sheet1!A2:H',
     });
     const values = response.data.values;
-    console.log(values);
     await connect();
     if (!values) {
       console.log('No data found.');
@@ -203,7 +226,6 @@ async function getSheetValues() {
         const response = await getLocationId(detail.locationName);
         const bodyObj = JSON.parse(response.body);
         const locationId = bodyObj.locationId;
-        
         const res = await addStudentbyname(
           locationId,
           detail.locationName,
@@ -230,6 +252,5 @@ async function getSheetValues() {
     return [];
   }
 }
-
-getSheetValues();
+insertLocation().then(()=> getSheetValues()).catch((err)=> console.log(err))
 

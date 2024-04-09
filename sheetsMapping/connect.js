@@ -105,7 +105,7 @@ const addStudent=async(currentlocationId,locationName,StudentName,StudentAge,Stu
   const studentId = uuidv4();
   try {
       let location = await Location.findOne({ name: locationName });
-          location.students.push({ studentId, name: StudentName, age: StudentAge,level:StudentLevel,FatherName:FatherName,phoneNo:PhNumber,class:Class,school:School });
+          location.students.push({ studentId, name: StudentName, age: StudentAge,level:StudentLevel,fatherName:FatherName,phoneNumber:PhNumber,division:Class,school:School });
       await location.save();
       return { status: 200, body: "Student added successfully" };
     } catch (err) {
@@ -128,9 +128,9 @@ const editStudent=async(locationId, studentId, newName, newAge,level,FatherName,
   location.students[studentIndex].name = newName;
   location.students[studentIndex].age = newAge;
   location.students[studentIndex].level = level;
-  location.students[studentIndex].FatherName = FatherName;
-  location.students[studentIndex].phoneNo = PhNumber;
-  location.students[studentIndex].class = Class;
+  location.students[studentIndex].fatherName = FatherName;
+  location.students[studentIndex].phoneNumber = PhNumber;
+  location.students[studentIndex].division = Class;
   location.students[studentIndex].school = School;
 
   try {

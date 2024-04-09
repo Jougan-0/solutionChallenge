@@ -12,7 +12,7 @@ interface Location {
   _id: string;
   locationId: string;
   name: string;
-  students: { studentId: string; name: string; age: number;level:number;Image:string }[];
+  students: { studentId: string; name: string; age: number;level:number;Image:string,fatherName:string,school:string,division:string,phoneNumber:number }[];
   __v: number;
 }
 interface Student {
@@ -21,6 +21,10 @@ interface Student {
   age: number;
   level:number;
   Image:string;
+  fatherName:string;
+  school:string;
+  division:string;
+  phoneNumber:number;
   // Add other properties if needed
 }
 interface AddStudentModalProps {
@@ -35,6 +39,14 @@ interface AddStudentModalProps {
   setAge: React.Dispatch<React.SetStateAction<string>>;
   level: string;
   setLevel: React.Dispatch<React.SetStateAction<string>>;
+  fatherName:string;
+  setFatherName: React.Dispatch<React.SetStateAction<string>>;
+  school:string;
+  setSchool: React.Dispatch<React.SetStateAction<string>>;
+  division:string;
+  setDivision: React.Dispatch<React.SetStateAction<string>>;
+  phoneNumber:string;
+  setPhoneNumber: React.Dispatch<React.SetStateAction<string>>;
 }
 const EditStudentModal: React.FC<{
   isOpen: boolean;
@@ -48,6 +60,14 @@ const EditStudentModal: React.FC<{
   setLevel: React.Dispatch<React.SetStateAction<string>>;
   studentImage: string;
   setStudentImage: React.Dispatch<React.SetStateAction<string>>;
+  fatherName:string;
+  setFatherName: React.Dispatch<React.SetStateAction<string>>;
+  school:string;
+  setSchool: React.Dispatch<React.SetStateAction<string>>;
+  division:string;
+  setDivision: React.Dispatch<React.SetStateAction<string>>;
+  phoneNumber:string;
+  setPhoneNumber: React.Dispatch<React.SetStateAction<string>>;
 }> = ({ isOpen, closeModal, handleSubmit, studentName, setStudentName, age, setAge, level, setLevel, studentImage, setStudentImage }) => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(age,level,studentName+"his")
@@ -352,11 +372,17 @@ const Page: React.FC =() => {
   
   const [locations, setLocations] = useState<{ _id: string; locationId: string; locationName: string }[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState<string>('');
-  const [students, setStudents] = useState<{ studentId: string; name: string; age: number;level:number;Image:string }[]>([]);
+  const [students, setStudents] = useState<{ studentId: string; name: string; age: number;level:number;Image:string;fatherName:string;school:string;division:string;phoneNumber:number; }[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [studentName, setStudentName] = useState<string>('');
   const [locationName, setLocationName] = useState<string>('');
   const [age, setAge] = useState<string>('');
+  const [division, setdivision] = useState<string>('');
+  const [fatherName, setFatherName] = useState<string>('');
+  const [school, setSchool] = useState<string>('');
+
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+
   const [level, setLevel] = useState<string>('');
   const router = useRouter();
   const [bgColor, setBgColor] = useState<string>('rgb(30,103,126)');
@@ -366,10 +392,14 @@ const Page: React.FC =() => {
   const [studentImage, setStudentImage] = useState<string>('');
 
   
-  const openEditModal = (studentId: string,studentImage:string,studentName:string,age:string,level:string) => {
+  const openEditModal = (studentId: string,studentImage:string,studentName:string,age:string,level:string,fatherName:string,school:string,division:string,phoneNumber:string) => {
     setSelectedStudentId(studentId);
     setStudentName(studentName);
     setAge(age);
+    setFatherName(fatherName)
+    setSchool(school)
+    setdivision(division)
+    setPhoneNumber(phoneNumber)
     setLevel(level)
     setStudentImage(studentImage);
     setIsEditModalOpen(true);
@@ -421,6 +451,9 @@ const Page: React.FC =() => {
         const data: Location[] = await res.json();
         const selectedLocationStudents = data.find((location) => location.locationId === selectedLocationId)?.students.map((student) => ({
             ...student,
+            fatherName: student.fatherName,
+            phoneNumber: student.phoneNumber,
+             division: student.division,
             level: student.level,
             Image: student.Image,
         })) || [];
@@ -442,7 +475,7 @@ const Page: React.FC =() => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ locationName, studentName, age, level,image }),
+      body: JSON.stringify({ locationName, studentName, age, level,image,fatherName,school,division,phoneNumber }),
     });
 
     if (response.ok) {
@@ -460,7 +493,7 @@ const Page: React.FC =() => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ locationId: selectedLocationId, studentId: selectedStudentId, newName: studentName, newAge: parseInt(age),level:parseInt(level),Image:Image}),
+      body: JSON.stringify({ locationId: selectedLocationId, studentId: selectedStudentId, newName: studentName, newAge: parseInt(age),level:parseInt(level),Image:Image,fatherName:fatherName,school:school,division:division,phoneNumber:phoneNumber}),
     });
   
     if (response.ok) {
@@ -470,8 +503,6 @@ const Page: React.FC =() => {
       // Handle error
     }
   };
-  
-  
   
   return (
     <div>
@@ -571,10 +602,20 @@ const Page: React.FC =() => {
         setAge={setAge}
         level={level}
         setLevel={setLevel}
+        fatherName={fatherName}
+        setFatherName={setFatherName}
+        school={school}
+        setSchool={setSchool}
+        division={division}
+        setDivision={setdivision}
+        phoneNumber={phoneNumber}
+        setPhoneNumber={setPhoneNumber}
       />
     </div>
+  
+
     <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', marginLeft: 24, marginRight: 24,marginTop:40 }}>
-  {students.map((student: { studentId: string; name: string; age: number; level: number; Image: string }, index: number) => (
+  {students.map((student: { studentId: string; name: string; age: number; level: number; Image: string;fatherName:string;school:string;division:string;phoneNumber:number; }, index: number) => (
     <div key={student.studentId} className="student-card" style={{ width: '150px', height: '400px', margin: '10px', borderRadius: "5%", backgroundColor:"rgba(0,0,0,0.1)", boxShadow: "1px 1px 2px rgba(0,0,0,0.1)", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: '0 0 20%', position: 'relative' }}>
       <div style={{ position: 'absolute', top: '0px', left: '3px', zIndex: 2, color: 'white', fontSize: '15px', fontWeight: 'bold', }}>
         {student.level}
@@ -594,7 +635,7 @@ const Page: React.FC =() => {
         target.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
       }}
 
-        onClick={() => openEditModal(student.studentId, student.Image, student.name, student.age.toString(), student.level.toString())}
+        onClick={() => openEditModal(student.studentId, student.Image, student.name, student.age.toString(),student.fatherName,student.school,student.division,student.phoneNumber.toString() ,student.level.toString())}
       >
         <FaEdit />
       </button>
@@ -619,18 +660,48 @@ const Page: React.FC =() => {
           />
         </div>
       </div>
-      <p>
-        <span className="label" style={{ marginTop: '10px' }}>Name:</span>
-        <span className="value" style={{ marginLeft: 20 }}>{student.name}</span>
-      </p>
-      <p>
-        <span className="label" style={{ marginTop: '10px' }}>Age:</span>
-        <span className="value" style={{ marginLeft: 33 }}>{student.age}</span>
-      </p>
-      <p>
-        <span className="label" style={{ marginTop: '10px' }}>Level:</span>
-        <span className="value" style={{ marginLeft: 33 }}>{student.level}</span>
-      </p>
+      {student.name && (
+  <p>
+    <span className="label" style={{ marginTop: '10px' }}>Name:</span>
+    <span className="value" style={{ marginLeft: 20 }}>{student.name}</span>
+  </p>
+)}
+
+{student.fatherName && (
+  <p>
+    <span className="label" style={{ marginTop: '10px' }}>Father's Name:</span>
+    <span className="value" style={{ marginLeft: 20 }}>{student.fatherName}</span>
+  </p>
+)}
+
+{student.age && (
+  <p>
+    <span className="label" style={{ marginTop: '10px' }}>Age:</span>
+    <span className="value" style={{ marginLeft: 33 }}>{student.age}</span>
+  </p>
+)}
+
+{student.phoneNumber && (
+  <p>
+    <span className="label" style={{ marginTop: '10px' }}>Phone Number:</span>
+    <span className="value" style={{ marginLeft: 33 }}>{student.phoneNumber}</span>
+  </p>
+)}
+
+{student.division && (
+  <p>
+    <span className="label" style={{ marginTop: '10px' }}>Class:</span>
+    <span className="value" style={{ marginLeft: 33 }}>{student.division}</span>
+  </p>
+)}
+
+{student.school && (
+  <p>
+    <span className="label" style={{ marginTop: '10px' }}>School:</span>
+    <span className="value" style={{ marginLeft: 33 }}>{student.school}</span>
+  </p>
+)}
+
     </div>
   )).reduce((rows: JSX.Element[][], current: JSX.Element, index: number) => {
     const row = Math.floor(index / 4);
@@ -654,6 +725,14 @@ const Page: React.FC =() => {
   setLevel={setLevel}
   studentImage={studentImage}
   setStudentImage={setStudentImage}
+  fatherName={fatherName}
+  setFatherName={setFatherName}
+  school={school}
+  setSchool={setSchool}
+  division={division}
+  setDivision={setdivision}
+  phoneNumber={phoneNumber}
+  setPhoneNumber={setPhoneNumber}
 />
 </div>
 

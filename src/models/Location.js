@@ -13,10 +13,10 @@ const studentSchema = new Schema({
     level:Number,
     location: String,
     Image:String,
-    FatherName:String,
-    phoneNo:Number,
-    class:String,
+    fatherName:String,
     school:String,
+    division:String,
+    phoneNuumber:Number,
     // Add other student details as needed
 });
 
